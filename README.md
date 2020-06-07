@@ -1,27 +1,44 @@
-# TSDX Bootstrap
+# لیست نمادها
 
-This project was bootstrapped with [TSDX](https://github.com/jaredpalmer/tsdx).
+هر نماد شامل موارد زیر میباشد
+```js
+type Asset = {
+  id: string;
+  asset_code: string;
+  group_code: string;
+  industry: string;
+  board: string;
+  symbol: string;
+  symbol_latin: string;
+  name: string;
+  name_latin: string;
+};
+```
 
+برای گرفتن لیست تمام نماد ها از تابع `assets` استفاده کنید
+```js
+import { assets } from 'todo-this-library-on-npm';
+
+await assets();
+// [
+//  {
+//      id: 'loader.aspx?ParTree=111C1412&inscode=32338211917133256',
+//      asset_code: 'IRR1YASA0101',
+//      group_code: 'N2',
+//      industry: 'لاستيك و پلاستيك',
+//      board: 'فهرست اوليه',
+//      symbol_latin: 'YASX1',
+//      name_latin: 'Iran Yasa Tire-R',
+//      symbol: 'پاساح',
+//      name: 'ح . ايران‌ياساتايرورابر'
+//  },
+//  ...
+//]
+```
 ## Local Development
 
-Below is a list of commands you will probably find useful.
-
-### `npm start` or `yarn start`
-
-Runs the project in development/watch mode. Your project will be rebuilt upon changes. TSDX has a special logger for you convenience. Error messages are pretty printed and formatted for compatibility VS Code's Problems tab.
-
-<img src="https://user-images.githubusercontent.com/4060187/52168303-574d3a00-26f6-11e9-9f3b-71dbec9ebfcb.gif" width="600" />
-
-Your library will be rebuilt if you make edits.
-
-### `npm run build` or `yarn build`
-
-Bundles the package to the `dist` folder.
-The package is optimized and bundled with Rollup into multiple formats (CommonJS, UMD, and ES Module).
-
-<img src="https://user-images.githubusercontent.com/4060187/52168322-a98e5b00-26f6-11e9-8cf6-222d716b75ef.gif" width="600" />
-
-### `npm test` or `yarn test`
-
-Runs the test watcher (Jest) in an interactive mode.
-By default, runs tests related to files changed since the last commit.
+```bash
+yarn build
+yarn test
+yarn lint
+```
