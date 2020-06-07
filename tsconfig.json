@@ -7,7 +7,7 @@
     "declaration": true,
     "sourceMap": true,
     "rootDir": "./src",
-    "strict": true,
+    "strict": false,
     "noUnusedLocals": false,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
