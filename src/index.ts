@@ -1,3 +1,6 @@
+import axios from 'axios';
+import cheerio from 'cheerio';
+
 export const sum = (a: number, b: number) => {
   if ('development' === process.env.NODE_ENV) {
     console.log('boop');
@@ -16,7 +19,13 @@ export type Asset = {
     name_latin: string
 };
 
-export function assets() : Asset[] {
+export async function assets() : Promise<Asset[]> {
+  const page = await axios.get('http://www.tsetmc.com/Loader.aspx?ParTree=111C1417');
+  const $ = cheerio.load(page.data);
+  const result = [];
+  $('tbody tr').not(':first').each((_, tr) => {
 
-    return [];
+  });
+
+  return [];
 }

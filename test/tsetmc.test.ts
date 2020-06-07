@@ -1,7 +1,8 @@
-import { sum } from '../src';
+import { assets } from '../src';
 
-describe('blah', () => {
-  it('works', () => {
-    expect(sum(1, 1)).toEqual(2);
+describe('tsetmc.ir', () => {
+  it('assets return a list', async () => {
+    const result = await assets();
+    expect(Array.isArray(result)).toBeTruthy();
   });
 });

@@ -23,6 +23,9 @@
       "pre-commit": "tsdx lint"
     }
   },
+  "jest": {
+    "testEnvironment": "node"
+  },
   "prettier": {
     "printWidth": 80,
     "semi": true,
@@ -33,9 +36,14 @@
   "author": "amin roosta",
   "module": "dist/tsetmc-api.esm.js",
   "devDependencies": {
+    "@types/cheerio": "^0.22.18",
     "husky": "^4.2.5",
     "tsdx": "^0.13.2",
     "tslib": "^2.0.0",
     "typescript": "^3.9.5"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "cheerio": "^1.0.0-rc.3"
   }
 }
