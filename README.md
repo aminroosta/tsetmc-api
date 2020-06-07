@@ -15,7 +15,7 @@ type Asset = {
 };
 ```
 
-برای گرفتن لیست تمام نماد ها از تابع `assets` استفاده کنید
+برای گرفتن لیست تمام نماد ها از تابع زیر استفاده کنید
 ```js
 import { assets } from 'todo-this-library-on-npm';
 
