@@ -45,7 +45,8 @@
   },
   "dependencies": {
     "needle": "2.3.0",
-    "osmosis": "^1.1.10"
+    "osmosis": "^1.1.10",
+    "x-ray": "^2.3.4"
   },
   "resolutions": {
     "needle": "2.3.0"

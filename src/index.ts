@@ -1,12 +1,5 @@
-import osmosis from 'osmosis';
-import needle from 'needle';
-
-export const sum = (a: number, b: number) => {
-  if ('development' === process.env.NODE_ENV) {
-    console.log('boop');
-  }
-  return a + b;
-};
+import xray from 'x-ray';
+import request from 'superagent';
 
 export type Asset = {
   id: string;
@@ -21,41 +14,29 @@ export type Asset = {
 };
 
 export function assets(): Promise<Asset[]> {
-  return new Promise((resolve, _) => {
-    const all: Asset[] = [];
-    osmosis
-      .get('http://www.tsetmc.com/Loader.aspx?ParTree=111C1417')
-      .find('table tr:gt(0)')
-      .set({
-        id: 'td:eq(7) a@href',
-        asset_code: 'td:eq(0)',
-        group_code: 'td:eq(1)',
-        industry: 'td:eq(2)',
-        board: 'td:eq(3)',
-        symbol_latin: 'td:eq(4)',
-        name_latin: 'td:eq(5)',
-        symbol: 'td:eq(6)',
-        name: 'td:eq(7)',
-      })
-      .data((asset: Asset) => {
-        asset.id = asset.id.split('=').pop() as string;
-        all.push(asset);
-      })
-      .done(() => resolve(all));
-  });
+  return xray({
+    filters: {
+      getid: href => href.split('=').pop(),
+    },
+  })(
+    'http://www.tsetmc.com/Loader.aspx?ParTree=111C1417',
+    'table tr:not(:first-child)',
+    [
+      {
+        id: 'td:nth-child(8) a@href | getid',
+        asset_code: 'td:nth-child(1)',
+        group_code: 'td:nth-child(2)',
+        industry: 'td:nth-child(3)',
+        board: 'td:nth-child(4)',
+        symbol_latin: 'td:nth-child(5)',
+        name_latin: 'td:nth-child(6)',
+        symbol: 'td:nth-child(7)',
+        name: 'td:nth-child(8)',
+      },
+    ]
+  );
 }
 
-// 20200607@       date
-// 10569.00@       high
-// 10107.00@       low
-// 10562.00@       final
-// 10549.00@       close
-// 10569.00@       open
-// 10066.00@       yesterday
-// 2413479648628.00@ value
-// 228499778@      volume
-// 17705@          count
-//
 export type OHLC = {
   tarikh: string;
   date: string;
@@ -70,45 +51,73 @@ export type OHLC = {
 };
 
 export function history(asset_id: string): Promise<OHLC[]> {
-  return needle(
-    'get',
-    `http://members.tsetmc.com/tsev2/data/InstTradeHistory.aspx?i=${asset_id}&Top=999999&A=0`
-  ).then(response => {
-    return (response.body as string)
-      .split(';')
-      .filter(row => row)
-      .map(row => {
-        const [
-          date,
-          high,
-          low,
-          final,
-          close,
-          open,
-          ,
-          value,
-          volume,
-          count,
-        ] = row.split('@');
-        const year = date.substr(0, 4),
-          month = date.substr(4, 2),
-          day = date.substr(6, 2);
-        const tarikh = new Date(+year, +month - 1, +day).toLocaleDateString(
-          'fa-IR'
-        );
+  return request
+    .get(
+      `http://members.tsetmc.com/tsev2/data/InstTradeHistory.aspx?i=${asset_id}&Top=999999&A=0`
+    )
+    .timeout({ response: 180 * 1000 })
+    .then(response => {
+      return response.text
+        .split(';')
+        .filter(row => row)
+        .map(row => {
+          const [
+            date,
+            high,
+            low,
+            final,
+            close,
+            open,
+            ,
+            value,
+            volume,
+            count,
+          ] = row.split('@');
+          const year = date.substr(0, 4),
+            month = date.substr(4, 2),
+            day = date.substr(6, 2);
+          const tarikh = new Date(+year, +month - 1, +day).toLocaleDateString(
+            'fa-IR'
+          );
 
-        return {
-          tarikh,
-          date: `${year}-${month}-${day}`,
-          count: +count,
-          volume: +volume,
-          value: +value,
-          open: +open,
-          high: +high,
-          low: +low,
-          close: +close,
-          final: +final,
-        };
-      });
+          return {
+            tarikh,
+            date: `${year}-${month}-${day}`,
+            count: +count,
+            volume: +volume,
+            value: +value,
+            open: +open,
+            high: +high,
+            low: +low,
+            close: +close,
+            final: +final,
+          };
+        });
+    });
+}
+
+export type Message = {
+  title: string;
+  tarikh: string;
+  content: string;
+};
+
+export function messages(asset_id: string): Promise<Message[]> {
+  return xray()(
+    `http://www.tsetmc.com/Loader.aspx?Partree=15131W&i=${asset_id}`,
+    'tr',
+    [
+      {
+        title: 'th:nth-child(1)',
+        tarikh: 'th:nth-child(2)',
+        content: 'td',
+      },
+    ]
+  ).then(rows => {
+    let all = [];
+    for (let idx = 0; idx < rows.length / 2; ++idx) {
+      all.push(Object.assign({}, rows[idx * 2], rows[idx * 2 + 1]));
+    }
+    return all;
   });
 }
