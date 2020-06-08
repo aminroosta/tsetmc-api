@@ -36,7 +36,8 @@
   "author": "amin roosta",
   "module": "dist/tsetmc-api.esm.js",
   "devDependencies": {
-    "@types/osmosis": "^1.1.1",
+    "@types/needle": "^2.0.4",
+    "@types/node": "^14.0.11",
     "husky": "^4.2.5",
     "tsdx": "^0.13.2",
     "tslib": "^2.0.0",
@@ -45,8 +46,8 @@
   "dependencies": {
     "needle": "2.3.0",
     "osmosis": "^1.1.10"
-    },
-    "resolutions": {
-      "needle": "2.3.0"
-    }
+  },
+  "resolutions": {
+    "needle": "2.3.0"
+  }
 }

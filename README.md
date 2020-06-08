@@ -1,20 +1,5 @@
 # لیست نمادها
 
-هر نماد شامل موارد زیر میباشد
-```js
-type Asset = {
-  id: string;
-  asset_code: string;
-  group_code: string;
-  industry: string;
-  board: string;
-  symbol: string;
-  symbol_latin: string;
-  name: string;
-  name_latin: string;
-};
-```
-
 برای گرفتن لیست تمام نماد ها از تابع زیر استفاده کنید
 ```js
 import { assets } from 'todo-this-library-on-npm';
@@ -22,19 +7,42 @@ import { assets } from 'todo-this-library-on-npm';
 await assets();
 // [
 //  {
-//      id: 'loader.aspx?ParTree=111C1412&inscode=32338211917133256',
-//      asset_code: 'IRR1YASA0101',
-//      group_code: 'N2',
+//      id: '32338211917133256',
+//      asset_code: 'IRR1YASA0101',         // کد نماد
+//      group_code: 'N2',                   // گروه
 //      industry: 'لاستيك و پلاستيك',
 //      board: 'فهرست اوليه',
-//      symbol_latin: 'YASX1',
-//      name_latin: 'Iran Yasa Tire-R',
+//      symbol_latin: 'YASX1',              // نماد به لاتین
+//      name_latin: 'Iran Yasa Tire-R',     // نام به لاتین
 //      symbol: 'پاساح',
 //      name: 'ح . ايران‌ياساتايرورابر'
 //  },
 //  ...
 //]
 ```
+
+# سابقه نماد
+برای گرفتن قیمت های روزانه یک نماد از تابع زیر استفاده کنید
+
+```js
+await history('32338211917133256');
+// [
+//   {
+//     tarikh: '۱۳۹۹/۳/۱۰',     // تاریخ به فارسی
+//     date: '2020-05-30',      // تاریخ به میلادی
+//     count: 19256,            // تعداد
+//     volume: 239302335,       // حجم معاملات
+//     value: 2174536324247,    // ارزش معاملات
+//     open: 9087,              // اولین قیمت
+//     high: 9087,              // بیشترین قیمت
+//     low: 9080,               // کمترین قیمت
+//     close: 9087,             // قیمت آخرین معامله
+//     final: 9087              // قیمت پایانی
+//   },
+//   ...
+// ]
+```
+
 ## Local Development
 
 ```bash

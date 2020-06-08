@@ -1,4 +1,5 @@
 import osmosis from 'osmosis';
+import needle from 'needle';
 
 export const sum = (a: number, b: number) => {
   if ('development' === process.env.NODE_ENV) {
@@ -37,11 +38,77 @@ export function assets(): Promise<Asset[]> {
         name: 'td:eq(7)',
       })
       .data((asset: Asset) => {
-        asset.id = asset.id.split('=').pop();
+        asset.id = asset.id.split('=').pop() as string;
         all.push(asset);
       })
-      .done(() => {
-        resolve(all);
+      .done(() => resolve(all));
+  });
+}
+
+// 20200607@       date
+// 10569.00@       high
+// 10107.00@       low
+// 10562.00@       final
+// 10549.00@       close
+// 10569.00@       open
+// 10066.00@       yesterday
+// 2413479648628.00@ value
+// 228499778@      volume
+// 17705@          count
+//
+export type OHLC = {
+  tarikh: string;
+  date: string;
+  count: number;
+  volume: number;
+  value: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  final: number;
+};
+
+export function history(asset_id: string): Promise<OHLC[]> {
+  return needle(
+    'get',
+    `http://members.tsetmc.com/tsev2/data/InstTradeHistory.aspx?i=${asset_id}&Top=999999&A=0`
+  ).then(response => {
+    return (response.body as string)
+      .split(';')
+      .filter(row => row)
+      .map(row => {
+        const [
+          date,
+          high,
+          low,
+          final,
+          close,
+          open,
+          ,
+          value,
+          volume,
+          count,
+        ] = row.split('@');
+        const year = date.substr(0, 4),
+          month = date.substr(4, 2),
+          day = date.substr(6, 2);
+        const tarikh = new Date(+year, +month - 1, +day).toLocaleDateString(
+          'fa-IR'
+        );
+
+        return {
+          tarikh,
+          date: `${year}-${month}-${day}`,
+          count: +count,
+          volume: +volume,
+          value: +value,
+          open: +open,
+          high: +high,
+          low: +low,
+          close: +close,
+          final: +final,
+        };
       });
   });
 }
