@@ -1,3 +1,6 @@
+```
+npm install --save tsetmc-api
+```
 <h1 dir="rtl"> لیست نمادها </h1>
 
 <p dir="rtl">
@@ -5,7 +8,7 @@
 </p>
 
 ```js
-import { assets } from 'todo-this-library-on-npm';
+import { assets } from 'tsetmc-api';
 
 await assets();
 // [
