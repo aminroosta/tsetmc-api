@@ -1,4 +1,4 @@
-import { assets, history, messages } from '../src';
+import { assets, history, messages, intraday } from '../src';
 // import fs from 'fs';
 // fs.writeFileSync('out.txt', JSON.stringify(result, null, 1), 'utf-8');
 
@@ -48,7 +48,7 @@ describe('tsetmc.ir', () => {
       180 * 1000
     );
 
-  1 &&
+  0 &&
     it(
       'messages returns a list',
       async () => {
@@ -65,5 +65,23 @@ describe('tsetmc.ir', () => {
         );
       },
       60 * 1000
+    );
+
+  1 &&
+    it(
+      'intraday returns a list',
+      async () => {
+        const result: any = await intraday('32338211917133256', '2020-03-16');
+        console.log(result.order_book);
+
+        expect(1).toEqual(1);
+        // expect(result).toEqual(
+        //   expect.arrayContaining([
+        //     {
+        //     },
+        //   ])
+        // );
+      },
+      180 * 1000
     );
 });

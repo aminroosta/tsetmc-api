@@ -98,3 +98,66 @@ export function messages(asset_id: string): Promise<Message[]> {
     return all;
   });
 }
+
+export type Trade = {
+  index: number;
+  time: string;
+  volume: number;
+  price: number;
+  cancled?: boolean;
+};
+
+export type SpotPrice = {
+  time: string;
+  close: number;
+  final: number;
+};
+
+export type Order = {
+  time: string;
+  bid: number;
+  ask: number;
+};
+
+/**
+ * The intraday data for a given symbol on a specific date
+ * @param asset_id asset id - returned by assets() method
+ * @param date in YYYY-MM-DD format - for example "2020-06-02"
+ */
+export function intraday(asset_id: string, date: string) {
+  // : Promise<{trades: Trade[]}
+  date = date.replace(/-/g, '');
+  return request
+    .get(`http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=${asset_id}&d=${date}`)
+    .timeout({ response: 180 * 1000 })
+    .then(response => {
+      const text = response.text;
+
+      let d = text.match(/.*ClosingPriceData=\[(.*)\];/);
+      const spot_price: SpotPrice[] = JSON.parse(
+        `[${(d && d[1] && d[1].replace(/'/g, '"')) || ''}]`
+      ).map(r => ({
+        time: r[0].split(' ')[1],
+        close: +r[2],
+        final: +r[3],
+      }));
+
+      d = text.match(/.*BestLimitData=\[(.*)\];/);
+      const order_book: Order[] = JSON.parse(`[${(d && d[1] && d[1].replace(/'/g, '"')) || ''}]`)
+        .filter(r => r[1] === '1')
+        .map(r => {
+          let d = r[0] + '';
+          d = d.length === 5 ? '0' + d : d;
+          return {
+            time: d[0] + d[1] + ':' + d[2] + d[3] + ':' + d[4] + d[5],
+            bid: +r[4],
+            ask: +r[5],
+          };
+        });
+
+      return {
+        spot_price,
+        order_book,
+      };
+    });
+}
