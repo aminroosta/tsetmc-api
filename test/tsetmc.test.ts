@@ -69,18 +69,39 @@ describe('tsetmc.ir', () => {
 
   1 &&
     it(
-      'intraday returns a list',
+      'intraday returns spot_prices, trades, and order_book',
       async () => {
-        const result: any = await intraday('32338211917133256', '2020-03-16');
-        console.log(result.order_book);
+        const result = await intraday('32338211917133256', '2020-03-16');
 
-        expect(1).toEqual(1);
-        // expect(result).toEqual(
-        //   expect.arrayContaining([
-        //     {
-        //     },
-        //   ])
-        // );
+        expect(result.spot_prices).toEqual(
+          expect.arrayContaining([
+            {
+              time: '09:02:22',
+              close: 7452,
+              final: 7722,
+            },
+          ])
+        );
+
+        expect(result.trades).toEqual(
+          expect.arrayContaining([
+            {
+              time: '09:02:27',
+              volume: 872,
+              price: 8001,
+            },
+          ])
+        );
+
+        expect(result.order_book).toEqual(
+          expect.arrayContaining([
+            {
+              time: '08:48:13',
+              bid: 8390,
+              ask: 8390,
+            },
+          ])
+        );
       },
       180 * 1000
     );

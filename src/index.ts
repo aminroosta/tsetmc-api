@@ -100,11 +100,9 @@ export function messages(asset_id: string): Promise<Message[]> {
 }
 
 export type Trade = {
-  index: number;
   time: string;
   volume: number;
   price: number;
-  cancled?: boolean;
 };
 
 export type SpotPrice = {
@@ -124,8 +122,14 @@ export type Order = {
  * @param asset_id asset id - returned by assets() method
  * @param date in YYYY-MM-DD format - for example "2020-06-02"
  */
-export function intraday(asset_id: string, date: string) {
-  // : Promise<{trades: Trade[]}
+export function intraday(
+  asset_id: string,
+  date: string
+): Promise<{
+  trades: Trade[];
+  spot_prices: SpotPrice[];
+  order_book: Order[];
+}> {
   date = date.replace(/-/g, '');
   return request
     .get(`http://cdn.tsetmc.com/Loader.aspx?ParTree=15131P&i=${asset_id}&d=${date}`)
@@ -134,7 +138,7 @@ export function intraday(asset_id: string, date: string) {
       const text = response.text;
 
       let d = text.match(/.*ClosingPriceData=\[(.*)\];/);
-      const spot_price: SpotPrice[] = JSON.parse(
+      const spot_prices: SpotPrice[] = JSON.parse(
         `[${(d && d[1] && d[1].replace(/'/g, '"')) || ''}]`
       ).map(r => ({
         time: r[0].split(' ')[1],
@@ -155,9 +159,20 @@ export function intraday(asset_id: string, date: string) {
           };
         });
 
+      d = text.match(/.*IntraTradeData=\[(.*)\];/);
+      const trades: Trade[] = JSON.parse(`[${(d && d[1] && d[1].replace(/'/g, '"')) || ''}]`)
+        .sort((a, b) => a[0] - b[0])
+        .filter(r => !r[4])
+        .map(r => ({
+          time: r[1],
+          volume: +r[2],
+          price: +r[3],
+        }));
+
       return {
-        spot_price,
+        spot_prices,
         order_book,
+        trades,
       };
     });
 }
