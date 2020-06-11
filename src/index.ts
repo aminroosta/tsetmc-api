@@ -137,17 +137,15 @@ export function intraday(
     .then(response => {
       const text = response.text;
 
-      let d = text.match(/.*ClosingPriceData=\[(.*)\];/);
-      const spot_prices: SpotPrice[] = JSON.parse(
-        `[${(d && d[1] && d[1].replace(/'/g, '"')) || ''}]`
-      ).map(r => ({
+      let d = text.split('ClosingPriceData=[')[1].split('];', 1)[0] || '';
+      const spot_prices: SpotPrice[] = JSON.parse(`[${d.replace(/'/g, '"')}]`).map(r => ({
         time: r[0].split(' ')[1],
         close: +r[2],
         final: +r[3],
       }));
 
-      d = text.match(/.*BestLimitData=\[(.*)\];/);
-      const order_book: Order[] = JSON.parse(`[${(d && d[1] && d[1].replace(/'/g, '"')) || ''}]`)
+      d = text.split('BestLimitData=[')[1].split('];', 1)[0] || '';
+      const order_book: Order[] = JSON.parse(`[${d.replace(/'/g, '"')}]`)
         .filter(r => r[1] === '1')
         .map(r => {
           let d = r[0] + '';
@@ -159,8 +157,8 @@ export function intraday(
           };
         });
 
-      d = text.match(/.*IntraTradeData=\[(.*)\];/);
-      const trades: Trade[] = JSON.parse(`[${(d && d[1] && d[1].replace(/'/g, '"')) || ''}]`)
+      d = text.split('IntraTradeData=[')[1].split('];', 1)[0] || '';
+      const trades: Trade[] = JSON.parse(`[${d.replace(/'/g, '"')}]`)
         .sort((a, b) => a[0] - b[0])
         .filter(r => !r[4])
         .map(r => ({
